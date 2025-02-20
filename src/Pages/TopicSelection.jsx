@@ -8,12 +8,57 @@ import {
   Download,
   ChevronRight,
 } from "lucide-react";
+import axios from "axios";
 
 function TopicSelection() {
   const [currentPage, setCurrentPage] = useState("topic");
   const [selectedTopic, setSelectedTopic] = useState("");
   const [content, setContent] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [plagiarismStats, setPlagiarismStats] = useState(null);
+
+  const generateContent = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post("https://your-backend.com/generate", {
+        topic: selectedTopic,
+      });
+      setContent(response.data.generatedContent);
+    } catch (error) {
+      console.error("Error generating content:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refineContent = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post("https://your-backend.com/refine", {
+        content,
+      });
+      setContent(response.data.refinedContent);
+    } catch (error) {
+      console.error("Error refining content:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkPlagiarism = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post("https://your-backend.com/plagiarism", {
+        content,
+      });
+      setPlagiarismStats(response.data);
+    } catch (error) {
+      console.error("Error checking plagiarism:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const trendingTopics = [
     "AI in Healthcare",
@@ -105,10 +150,17 @@ function TopicSelection() {
         />
         <div className="mt-4 flex gap-4">
           <button
-            onClick={() => {}}
+            onClick={generateContent}
+            disabled={loading}
             className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
           >
-            <Sparkles size={18} /> Generate Content
+            {loading ? (
+              "Generating..."
+            ) : (
+              <>
+                <Sparkles size={18} /> Generate Content
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -117,26 +169,30 @@ function TopicSelection() {
         <h2 className="text-xl font-semibold mb-6">AI Assistant</h2>
         <div className="space-y-4">
           <button
-            onClick={() => {}}
+            onClick={checkPlagiarism}
+            disabled={loading}
             className="w-full bg-white border border-gray-200 p-4 rounded-lg hover:border-blue-500 hover:shadow-md transition-all flex items-center gap-3"
           >
             <Shield className="text-blue-600" />
             <div className="text-left">
               <h3 className="font-semibold">Plagiarism Check</h3>
               <p className="text-sm text-gray-600">
-                Verify content originality
+                {loading ? "Checking..." : "Verify content originality"}
               </p>
             </div>
           </button>
 
           <button
-            onClick={() => {}}
+            onClick={refineContent}
+            disabled={loading}
             className="w-full bg-white border border-gray-200 p-4 rounded-lg hover:border-blue-500 hover:shadow-md transition-all flex items-center gap-3"
           >
             <RefreshCw className="text-purple-600" />
             <div className="text-left">
               <h3 className="font-semibold">Refine Content</h3>
-              <p className="text-sm text-gray-600">Improve writing quality</p>
+              <p className="text-sm text-gray-600">
+                {loading ? "Refining..." : "Improve writing quality"}
+              </p>
             </div>
           </button>
 
@@ -147,6 +203,16 @@ function TopicSelection() {
             <FileCheck size={20} /> Continue to Templates
           </button>
         </div>
+
+        {plagiarismStats && (
+          <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <h3 className="font-semibold text-lg">Plagiarism Report</h3>
+            <p className="text-sm text-gray-600">
+              Similarity: {plagiarismStats.similarity}% <br />
+              Sources: {plagiarismStats.sources?.join(", ") || "None"}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
