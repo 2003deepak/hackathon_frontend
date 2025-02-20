@@ -1,26 +1,45 @@
-
-import React, { useState } from 'react';
-import { Search, Sparkles, Shield, RefreshCw, FileCheck, Download, ChevronRight } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Search,
+  Sparkles,
+  Shield,
+  RefreshCw,
+  FileCheck,
+  Download,
+  ChevronRight,
+} from "lucide-react";
 
 function TopicSelection() {
-  const [currentPage, setCurrentPage] = useState('topic');
-  const [selectedTopic, setSelectedTopic] = useState('');
-  const [content, setContent] = useState('');
+  const [currentPage, setCurrentPage] = useState("topic");
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [content, setContent] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState(0);
 
   const trendingTopics = [
-    'AI in Healthcare',
-    'Sustainable Living',
-    'Future of Work',
-    'Digital Privacy',
-    'Mental Wellness',
-    'Tech Innovations'
+    "AI in Healthcare",
+    "Sustainable Living",
+    "Future of Work",
+    "Digital Privacy",
+    "Mental Wellness",
+    "Tech Innovations",
   ];
 
   const templates = [
-    { name: 'Modern Minimal', preview: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=600' },
-    { name: 'Creative Pro', preview: 'https://images.unsplash.com/photo-1432821596592-e2c18b78144f?auto=format&fit=crop&q=80&w=600' },
-    { name: 'Business Elite', preview: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=600' }
+    {
+      name: "Modern Minimal",
+      preview:
+        "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=600",
+    },
+    {
+      name: "Creative Pro",
+      preview:
+        "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?auto=format&fit=crop&q=80&w=600",
+    },
+    {
+      name: "Business Elite",
+      preview:
+        "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=600",
+    },
   ];
 
   const renderTopicPage = () => (
@@ -29,7 +48,9 @@ function TopicSelection() {
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           Create Amazing Blog Content with AI
         </h1>
-        <p className="text-gray-600">Generate engaging blog posts in minutes with our AI-powered platform</p>
+        <p className="text-gray-600">
+          Generate engaging blog posts in minutes with our AI-powered platform
+        </p>
       </div>
 
       <div className="relative mb-8">
@@ -59,7 +80,7 @@ function TopicSelection() {
       </div>
 
       <button
-        onClick={() => setCurrentPage('content')}
+        onClick={() => setCurrentPage("content")}
         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
       >
         Continue <ChevronRight size={20} />
@@ -70,6 +91,12 @@ function TopicSelection() {
   const renderContentPage = () => (
     <div className="h-[calc(100vh-2rem)] grid grid-cols-1 lg:grid-cols-2 gap-6 p-4">
       <div className="bg-white rounded-xl shadow-lg p-6">
+        <button
+          onClick={() => setCurrentPage("topic")}
+          className="mb-4 text-gray-600 hover:text-blue-600 flex items-center gap-1"
+        >
+          <ChevronRight className="rotate-180" size={18} /> Back
+        </button>
         <textarea
           className="w-full h-[calc(100%-4rem)] p-4 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="Start writing your blog post..."
@@ -96,7 +123,9 @@ function TopicSelection() {
             <Shield className="text-blue-600" />
             <div className="text-left">
               <h3 className="font-semibold">Plagiarism Check</h3>
-              <p className="text-sm text-gray-600">Verify content originality</p>
+              <p className="text-sm text-gray-600">
+                Verify content originality
+              </p>
             </div>
           </button>
 
@@ -112,7 +141,7 @@ function TopicSelection() {
           </button>
 
           <button
-            onClick={() => setCurrentPage('template')}
+            onClick={() => setCurrentPage("template")}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
           >
             <FileCheck size={20} /> Continue to Templates
@@ -124,17 +153,31 @@ function TopicSelection() {
 
   const renderTemplatePage = () => (
     <div className="max-w-6xl mx-auto px-4">
-      <h2 className="text-2xl font-semibold mb-8 text-center">Choose Your Blog Template</h2>
+      <button
+        onClick={() => setCurrentPage("content")}
+        className="mb-4 text-gray-600 hover:text-blue-600 flex items-center gap-1"
+      >
+        <ChevronRight className="rotate-180" size={18} /> Back
+      </button>
+      <h2 className="text-2xl font-semibold mb-8 text-center">
+        Choose Your Blog Template
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         {templates.map((template, index) => (
           <div
             key={index}
             className={`rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-              selectedTemplate === index ? 'border-blue-500 shadow-lg' : 'border-gray-200 hover:border-blue-300'
+              selectedTemplate === index
+                ? "border-blue-500 shadow-lg"
+                : "border-gray-200 hover:border-blue-300"
             }`}
             onClick={() => setSelectedTemplate(index)}
           >
-            <img src={template.preview} alt={template.name} className="w-full h-48 object-cover" />
+            <img
+              src={template.preview}
+              alt={template.name}
+              className="w-full h-48 object-cover"
+            />
             <div className="p-4">
               <h3 className="font-semibold">{template.name}</h3>
             </div>
@@ -163,9 +206,9 @@ function TopicSelection() {
       </nav>
 
       <main className="container mx-auto py-8">
-        {currentPage === 'topic' && renderTopicPage()}
-        {currentPage === 'content' && renderContentPage()}
-        {currentPage === 'template' && renderTemplatePage()}
+        {currentPage === "topic" && renderTopicPage()}
+        {currentPage === "content" && renderContentPage()}
+        {currentPage === "template" && renderTemplatePage()}
       </main>
     </div>
   );
