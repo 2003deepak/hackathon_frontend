@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useRef} from "react";
 import {
   Search,
   Sparkles,
@@ -7,7 +7,13 @@ import {
   FileCheck,
   Download,
   ChevronRight,
+  ChevronLeft, Clock, User, Calendar
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import { useReactToPrint } from "react-to-print";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { motion } from "framer-motion";
 import axios from "axios";
 
 function TopicSelection() {
@@ -31,23 +37,26 @@ function TopicSelection() {
   const [rloading, setrLoading] = useState(false);
   const [plagiarismStats, setPlagiarismStats] = useState(null);
 
-  const templates = [
-    {
-      name: "Modern Minimal",
-      preview:
-        "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=600",
-    },
-    {
-      name: "Creative Pro",
-      preview:
-        "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?auto=format&fit=crop&q=80&w=600",
-    },
-    {
-      name: "Business Elite",
-      preview:
-        "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=600",
-    },
-  ];
+  const printRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: "AI Blog",
+  });
+
+  const handleDownloadPDF = async () => {
+    const element = printRef.current;
+    const canvas = await html2canvas(element, { scale: 2 });
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF("p", "mm", "a4");
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 0, 10, imgWidth, imgHeight);
+    pdf.save(`${selectedTopic}.pdf`);
+  };
+
 
   // Fetch trending topics from API
   const fetchTrendingTopics = async () => {
@@ -110,6 +119,12 @@ function TopicSelection() {
     }
   };
 
+  const Marquee = ({ children }) => (
+    <div className="relative w-full overflow-hidden whitespace-nowrap">
+      <div className="animate-marquee flex gap-4">{children}{children}</div>
+    </div>
+  );
+
 
   const renderTopicPage = () => (
     <div className="max-w-4xl mx-auto px-4">
@@ -136,17 +151,27 @@ function TopicSelection() {
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Trending Topics</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {trendingTopics.map((topic) => (
-            <button
-              key={topic}
-              onClick={() => setSelectedTopic(topic)}
-              className="p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all text-left"
-            >
-              {topic}
-            </button>
-          ))}
-        </div>
+        <div className="relative overflow-hidden">
+      <h2 className="text-2xl font-semibold text-center mb-6">🔥 Trending Topics</h2>
+
+      {/* Marquee Wrapper */}
+      <Marquee>
+        {trendingTopics.map((topic, index) => (
+          <motion.button
+            key={index}
+            onClick={() => setSelectedTopic(topic)}
+            className="p-4 rounded-lg shadow-lg border border-gray-200 text-white text-lg font-semibold cursor-pointer transition-all"
+            whileHover={{ scale: 1.1, rotateX: 10, rotateY: 10 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              background: `linear-gradient(135deg, hsl(${index * 40}, 80%, 60%), hsl(${index * 40 + 30}, 80%, 50%))`,
+            }}
+          >
+            {topic}
+          </motion.button>
+        ))}
+      </Marquee>
+    </div>
         <button
           onClick={fetchTrendingTopics}
           disabled={isGenerating}
@@ -259,47 +284,56 @@ function TopicSelection() {
   );
 
   const renderTemplatePage = () => (
-    <div className="max-w-6xl mx-auto px-4">
-      <button
-        onClick={() => setCurrentPage("content")}
-        className="mb-4 text-gray-600 hover:text-blue-600 flex items-center gap-1"
-      >
-        <ChevronRight className="rotate-180" size={18} /> Back
-      </button>
-      <h2 className="text-2xl font-semibold mb-8 text-center">
-        Choose Your Blog Template
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-        {templates.map((template, index) => (
-          <div
-            key={index}
-            className={`rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-              selectedTemplate === index
-                ? "border-blue-500 shadow-lg"
-                : "border-gray-200 hover:border-blue-300"
-            }`}
-            onClick={() => setSelectedTemplate(index)}
-          >
-            <img
-              src={template.preview}
-              alt={template.name}
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold">{template.name}</h3>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+    {/* Back Button */}
+    <button
+      onClick={() => setCurrentPage("content")}
+      className="mb-6 text-gray-600 hover:text-blue-600 flex items-center gap-2"
+    >
+      <ChevronLeft size={20} /> Back
+    </button>
 
+    {/* Blog Content Container */}
+    <div ref={printRef} className="bg-white p-6 rounded-lg shadow-lg">
+      {/* Blog Header */}
+      <header className="mb-8 text-center">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          {selectedTopic}
+        </h1>
+        <div className="flex justify-center items-center gap-6 text-gray-600">
+          <div className="flex items-center gap-2">
+            <User size={18} />
+            <span>Dr. Mark Twane</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar size={18} />
+            <span>March 15, 2024</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock size={18} />
+            <span>8 min read</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Blog Content Rendered from Markdown */}
+      <article className="prose prose-lg text-gray-800">
+        <ReactMarkdown>{content}</ReactMarkdown>
+      </article>
+    </div>
+
+    {/* Save as PDF Button */}
+    <div className="flex justify-center mt-6">
       <button
-        onClick={() => {}}
-        className="w-full max-w-md mx-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+        onClick={handleDownloadPDF}
+        className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold text-lg hover:opacity-90 transition-all flex items-center gap-2"
       >
-        <Download size={20} /> Save as PDF
+        <Download size={22} /> Download PDF
       </button>
     </div>
+  </div>
   );
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
