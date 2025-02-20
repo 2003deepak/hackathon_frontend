@@ -26,6 +26,9 @@ function TopicSelection() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const [selectedTemplate, setSelectedTemplate] = useState(0);
+  const [contentLoading, setContentLoading] = useState(false);
+  const [pLoading, setpLoading] = useState(false);
+  const [rloading, setrLoading] = useState(false);
   const [plagiarismStats, setPlagiarismStats] = useState(null);
 
   const templates = [
@@ -66,7 +69,7 @@ function TopicSelection() {
 
 
   const generateContent = async () => {
-    setLoading(true);
+    setContentLoading(true);
     try {
       const response = await axios.post("https://your-backend.com/generate", {
         topic: selectedTopic,
@@ -75,12 +78,12 @@ function TopicSelection() {
     } catch (error) {
       console.error("Error generating content:", error);
     } finally {
-      setLoading(false);
+      setContentLoading(false);
     }
   };
 
   const refineContent = async () => {
-    setLoading(true);
+    setrLoading(true);
     try {
       const response = await axios.post("https://your-backend.com/refine", {
         content,
@@ -89,12 +92,12 @@ function TopicSelection() {
     } catch (error) {
       console.error("Error refining content:", error);
     } finally {
-      setLoading(false);
+      setrLoading(false);
     }
   };
 
   const checkPlagiarism = async () => {
-    setLoading(true);
+    setpLoading(true);
     try {
       const response = await axios.post("https://your-backend.com/plagiarism", {
         content,
@@ -103,7 +106,7 @@ function TopicSelection() {
     } catch (error) {
       console.error("Error checking plagiarism:", error);
     } finally {
-      setLoading(false);
+      setpLoading(false);
     }
   };
 
@@ -187,10 +190,10 @@ function TopicSelection() {
         <div className="mt-4 flex gap-4">
           <button
             onClick={generateContent}
-            disabled={loading}
+            disabled={contentLoading}
             className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
           >
-            {loading ? (
+            {contentLoading ? (
               "Generating..."
             ) : (
               <>
@@ -206,28 +209,30 @@ function TopicSelection() {
         <div className="space-y-4">
           <button
             onClick={checkPlagiarism}
-            disabled={loading}
+            disabled={pLoading}
             className="w-full bg-white border border-gray-200 p-4 rounded-lg hover:border-blue-500 hover:shadow-md transition-all flex items-center gap-3"
           >
             <Shield className="text-blue-600" />
             <div className="text-left">
               <h3 className="font-semibold">Plagiarism Check</h3>
               <p className="text-sm text-gray-600">
-                {loading ? "Checking..." : "Verify content originality"}
+                {pLoading ? "Checking..." : "Verify content originality"}
               </p>
+
+              {pLoading && <p>{plagiarismStats}</p>}
             </div>
           </button>
 
           <button
             onClick={refineContent}
-            disabled={loading}
+            disabled={rloading}
             className="w-full bg-white border border-gray-200 p-4 rounded-lg hover:border-blue-500 hover:shadow-md transition-all flex items-center gap-3"
           >
             <RefreshCw className="text-purple-600" />
             <div className="text-left">
               <h3 className="font-semibold">Refine Content</h3>
               <p className="text-sm text-gray-600">
-                {loading ? "Refining..." : "Improve writing quality"}
+                {rloading ? "Refining..." : "Improve writing quality"}
               </p>
             </div>
           </button>
