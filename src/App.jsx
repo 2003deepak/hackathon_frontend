@@ -5,12 +5,11 @@ import Signup from "./Pages/Signup";
 import Page404 from "./Pages/Page404";
 
 import PublicLayout from "./layouts/PublicLayout";
-import ProtectedRoute from "./components/ProtectedRoute"; 
+import ProtectedRoute from "./components/ProtectedRoute";
 import TopicSelection from "./Pages/TopicSelection";
 import authStore from "./store/authStore"; // Zustand state for user authentication
 
 function App() {
-
   const { role } = authStore((state) => state);
 
   return (
@@ -18,9 +17,8 @@ function App() {
       {/* Public Routes */}
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Landing />} />
-        <Route path="login" element={<Login />}/>
-        <Route path="signup" element={<Signup />}/>
-
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
       </Route>
 
       {/* Protected Routes */}
@@ -33,11 +31,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-       
-
-        
-        
       </Route>
 
       {/* Catch-All Route */}
